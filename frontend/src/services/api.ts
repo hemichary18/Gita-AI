@@ -1,6 +1,6 @@
 import type { SupportedLanguage } from '../store/useChatStore';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:10000'; 
+export const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:10000'; 
 
 
 export interface ChatResponse {
@@ -15,7 +15,7 @@ export interface ChatResponse {
 }
 
 export const api = {
-  async sendMessage(message: string, language: SupportedLanguage): Promise<ChatResponse> {
+  async sendMessage(_message: string, _language: SupportedLanguage): Promise<ChatResponse> {
     try {
       // Stub implementation until FastAPI is ready
       // const res = await fetch(`${API_BASE_URL}/chat`, {

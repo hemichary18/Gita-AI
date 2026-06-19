@@ -1,4 +1,3 @@
-import { ReactNode } from 'react';
 import { Home, MessageCircle, Library as LibraryIcon, LogOut } from 'lucide-react';
 import { useAuthStore } from '../../store/useAuthStore';
 import { HomePage } from '../pages/HomePage';

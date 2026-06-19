@@ -21,10 +21,10 @@ export function SplashAnimation({ onComplete }: SplashAnimationProps) {
 
   const getGreeting = () => {
     if (user?.gender === 'female') {
-      const name = user.name || 'Sakhi';
+      const name = user?.name || 'Sakhi';
       return `Welcome, ${name}. The journey inward requires courage, and your quest for truth begins now. Speak to Me; what clouds your vision?`;
     } else {
-      const name = user.name || 'Parth';
+      const name = user?.name || 'Parth';
       return `Welcome, ${name}. The battlefield of the mind is vast, but you do not stand alone. Speak to Me; what weighs heavy upon your heart?`;
     }
   };
@@ -33,7 +33,7 @@ export function SplashAnimation({ onComplete }: SplashAnimationProps) {
   // Split text into words for a staggered blur fade-in
   const words = text.split(" ");
 
-  const container = {
+  const container: any = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
@@ -41,7 +41,7 @@ export function SplashAnimation({ onComplete }: SplashAnimationProps) {
     },
   };
 
-  const wordAnim = {
+  const wordAnim: any = {
     hidden: { opacity: 0, filter: 'blur(10px)', y: 10 },
     visible: {
       opacity: 1,

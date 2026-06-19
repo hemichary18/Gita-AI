@@ -43,8 +43,8 @@ export function LibraryPage() {
   }, []);
 
   // Generate dynamic sheets
-  const { sheets, chapterMap } = useMemo(() => {
-    if (selectedBook !== 'gita') return { sheets: [], chapterMap: {} };
+  const { sheets } = useMemo(() => {
+    if (selectedBook !== 'gita') return { sheets: [] };
     
     const generatedSheets: any[] = [];
     const chMap: Record<number, number> = {};
@@ -151,7 +151,7 @@ export function LibraryPage() {
       });
     }
 
-    return { sheets: generatedSheets, chapterMap: chMap };
+    return { sheets: generatedSheets };
   }, [selectedBook, gitaChapters, activeBookData]);
 
 

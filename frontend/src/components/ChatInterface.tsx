@@ -7,7 +7,7 @@ import { Send, Mic, StopCircle } from 'lucide-react';
 import { useSpeechToText } from '../hooks/useSpeechToText';
 
 export function ChatInterface() {
-  const { messages, addMessage, updateLastMessage, setIsProcessing, language, isProcessing } = useChatStore();
+  const { messages, addMessage, setIsProcessing, language, isProcessing } = useChatStore();
   const [inputText, setInputText] = useState('');
   const endOfMessagesRef = useRef<HTMLDivElement>(null);
   
