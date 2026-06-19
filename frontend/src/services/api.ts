@@ -1,6 +1,7 @@
 import type { SupportedLanguage } from '../store/useChatStore';
 
-const API_BASE_URL = 'http://localhost:8000/api'; // Adjust once FastAPI is running
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:10000'; 
+
 
 export interface ChatResponse {
   response: string;
