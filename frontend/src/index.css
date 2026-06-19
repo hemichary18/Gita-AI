@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: #0a0a0a; /* neutral-950 */
+}
+
+/* 3D Transform Utilities */
+@layer utilities {
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+  .transform-style-3d {
+    transform-style: preserve-3d;
+  }
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+  .rotate-y-180 {
+    transform: rotateY(-180deg);
+  }
+  .rotate-y-m185 {
+    transform: rotateY(-185deg);
+  }
+}
