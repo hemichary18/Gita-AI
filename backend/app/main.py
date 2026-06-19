@@ -1,9 +1,20 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
+import os
 
 app = FastAPI(title="GitaAI Backend")
 
+frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[frontend_url, "http://localhost:5173", "https://gita-ai-alpha.vercel.app"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 class ChatRequest(BaseModel):
     query: str
     session_id: Optional[str] = None
