@@ -2,21 +2,58 @@ import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ShlokaCard } from './ShlokaCard';
 import { useChatStore } from '../store/useChatStore';
-import { api } from '../services/api';
-import { Send, Mic, StopCircle } from 'lucide-react';
+import { api, API_BASE_URL } from '../services/api';
+import { Send, Mic, StopCircle, Volume2, VolumeX } from 'lucide-react';
 import { useSpeechToText } from '../hooks/useSpeechToText';
+import { LiveKitRoom, useRoomContext, RoomAudioRenderer } from '@livekit/components-react';
 
 export function ChatInterface() {
+  const [token, setToken] = useState<string>('');
+
+  useEffect(() => {
+    // Fetch LiveKit token from backend
+    fetch(`${API_BASE_URL.replace('/api', '')}/getToken?participant_name=Seeker`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.token) setToken(data.token);
+      })
+      .catch(err => console.error("Failed to fetch LiveKit token", err));
+  }, []);
+
+  if (!token) {
+    return (
+      <div className="w-full h-full flex items-center justify-center text-amber-500/50">
+        <div className="animate-pulse">Connecting to Krishna's Voice...</div>
+      </div>
+    );
+  }
+
+  return (
+    <LiveKitRoom 
+      serverUrl={import.meta.env.VITE_LIVEKIT_URL} 
+      token={token} 
+      connect={true}
+      audio={true}
+    >
+      <RoomAudioRenderer />
+      <ChatInterfaceInner />
+    </LiveKitRoom>
+  );
+}
+
+function ChatInterfaceInner() {
   const { messages, addMessage, setIsProcessing, language, isProcessing } = useChatStore();
   const [inputText, setInputText] = useState('');
   const endOfMessagesRef = useRef<HTMLDivElement>(null);
   
   const { isListening, transcript, startListening, stopListening, resetTranscript } = useSpeechToText(language);
+  const room = useRoomContext();
+  const [isVoiceMuted, setIsVoiceMuted] = useState(false);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     endOfMessagesRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, transcript]); // also scroll if transcript updates
+  }, [messages, transcript]);
 
   const handleToggleMic = () => {
     if (isListening) {
@@ -57,6 +94,13 @@ export function ChatInterface() {
         newMsgs[newMsgs.length - 1].shloka = response.shloka;
         return { messages: newMsgs, detectedEmotion: response.emotion_detected };
       });
+      
+      // Send text to the LiveKit Python agent to speak
+      if (room && room.localParticipant && !isVoiceMuted) {
+        const strData = new TextEncoder().encode(response.response);
+        room.localParticipant.publishData(strData, { reliable: true });
+      }
+      
     } catch (err) {
       useChatStore.getState().updateLastMessage("I am having trouble hearing you through the noise of the world. Please try again.", false);
     } finally {
@@ -73,7 +117,7 @@ export function ChatInterface() {
   };
 
   return (
-    <div className="w-full h-full flex flex-col justify-end pb-24 pt-4">
+    <div className="w-full h-full flex flex-col justify-end pb-24 pt-4 relative">
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto mb-4 space-y-6 px-2 scroll-smooth hide-scrollbar">
         <AnimatePresence>
@@ -140,22 +184,31 @@ export function ChatInterface() {
 
       {/* Input Bar */}
       <div className="relative flex items-center gap-2">
-        <form onSubmit={handleSubmit} className="flex-1">
+        <form onSubmit={handleSubmit} className="flex-1 relative">
           <input
             type="text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             placeholder="Speak to Krishna..."
             disabled={isProcessing || isListening}
-            className="w-full bg-neutral-900/80 border border-neutral-800 rounded-xl pl-4 pr-12 py-4 text-neutral-200 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 backdrop-blur-md transition-all disabled:opacity-50"
+            className="w-full bg-neutral-900/80 border border-neutral-800 rounded-xl pl-4 pr-24 py-4 text-neutral-200 placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 backdrop-blur-md transition-all disabled:opacity-50"
           />
-          <button 
-            type="submit" 
-            disabled={!inputText.trim() || isProcessing}
-            className="absolute right-14 top-1/2 -translate-y-1/2 p-2 text-amber-500 hover:text-amber-400 disabled:text-neutral-600 transition-colors"
-          >
-            <Send size={20} />
-          </button>
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+            <button
+              type="button"
+              onClick={() => setIsVoiceMuted(!isVoiceMuted)}
+              className="p-2 text-neutral-500 hover:text-amber-500 transition-colors"
+            >
+              {isVoiceMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+            </button>
+            <button 
+              type="submit" 
+              disabled={!inputText.trim() || isProcessing}
+              className="p-2 text-amber-500 hover:text-amber-400 disabled:text-neutral-600 transition-colors"
+            >
+              <Send size={20} />
+            </button>
+          </div>
         </form>
         
         <button 

@@ -68,7 +68,7 @@ CREATE INDEX IF NOT EXISTS conversations_user_updated_idx ON conversations(user_
 -- 4. Hybrid Search Function
 CREATE OR REPLACE FUNCTION hybrid_search(
     query_text TEXT,
-    query_embedding VECTOR(1536),
+    query_embedding VECTOR(1024),
     match_count INT DEFAULT 3
 )
 RETURNS TABLE(id UUID, chapter_number INT, verse_number INT, sanskrit_text TEXT, score FLOAT)

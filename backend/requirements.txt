@@ -5,4 +5,6 @@ supabase
 python-dotenv
 sentence-transformers
 livekit-api
+livekit-agents
+livekit-plugins-elevenlabs
 google-generativeai
